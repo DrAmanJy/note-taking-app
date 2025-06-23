@@ -1,73 +1,76 @@
-export const getNotes = (req, res) => {
-  if (notes.length === 0) {
-    return res.status(404).json({ message: "No notes found" });
+import Note from "../models/noteModel.js";
+
+export const getNotes = async (req, res) => {
+  try {
+    const notes = await Note.find();
+    if (notes.length === 0) {
+      return res.status(404).json({ message: "No notes found" });
+    }
+    return res.status(200).json({ notes });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
-  return res.status(200).json({ notes });
 };
-export const getNote = (req, res) => {
-  const id = req.params.id;
-  const note = notes.find((note) => note.id === id);
-  if (!note) {
-    return res.status(404).json({ message: "Note not found" });
+export const getNote = async (req, res) => {
+  try {
+    const note = await Note.findById(req.params.id);
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+    return res.status(200).json({ note });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
-  return res.status(200).json({ note });
 };
-export const addNote = (req, res) => {
-  let { id, title, description, completed } = req.body;
-  if (!id) {
-    return res.status(400).json({ message: "please provide id" });
-  } else if (!title) {
-    return res.status(400).json({ message: "please provide title" });
-  } else if (!description) {
-    return res.json({ message: "please provide description" });
-  } else if (typeof completed !== "boolean") completed = false;
-  const note = { id, title, description, completed };
-  notes.push(note);
-  return res.status(201).json({ message: "Note added", note });
+export const addNote = async (req, res) => {
+  const { title, description } = req.body;
+  try {
+    if (!title) {
+      return res.status(400).json({ message: "Please provide title" });
+    }
+    if (!description) {
+      return res.status(400).json({ message: "Please provide description" });
+    }
+
+    const newNote = await Note.create({ title, description });
+    return res.status(201).json({ message: "Note added", note: newNote });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
 };
-export const updateNote = (req, res) => {
+export const updateNote = async (req, res) => {
   const { title, description, completed } = req.body;
-  const id = req.params.id;
+  try {
+    if (!title || !description) {
+      return res
+        .status(400)
+        .json({ message: "Title and description are required" });
+    }
 
-  const index = notes.findIndex((note) => note.id === id);
-  if (index === -1) {
-    return res.status(404).json({ message: "Note not found" });
+    const updatedNote = await Note.findByIdAndUpdate(
+      req.params.id,
+      { title, description, completed },
+      { new: true }
+    );
+
+    if (!updatedNote) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+
+    return res.status(200).json({ message: "Note updated", note: updatedNote });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
-
-  if (!title || !description) {
-    return res
-      .status(400)
-      .json({ message: "Title and description are required" });
-  }
-
-  notes[index] = {
-    ...notes[index],
-    title,
-    description,
-    completed:
-      typeof completed === "boolean" ? completed : notes[index].completed,
-  };
-
-  return res.status(200).json({
-    message: "Note updated",
-    note: notes[index],
-  });
 };
-export const deleteNote = (req, res) => {
-  const id = req.params.id;
-  const index = notes.findIndex((note) => note.id === id);
-  if (index === -1) {
-    return res.status(404).json({ message: "Note not found" });
-  }
+export const deleteNote = async (req, res) => {
+  try {
+    const deletedNote = await Note.findByIdAndDelete(req.params.id);
+    if (!deletedNote) {
+      return res.status(404).json({ message: "Note not found" });
+    }
 
-  notes.splice(index, 1);
-  return res.status(200).json({ message: "Note deleted" });
+    return res.status(200).json({ message: "Note deleted" });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
 };
-let notes = [
-  {
-    id: "1",
-    title: "Express Notes",
-    description: "Practicing Express controllers",
-    completed: false,
-  },
-];
