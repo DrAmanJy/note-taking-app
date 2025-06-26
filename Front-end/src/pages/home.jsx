@@ -6,7 +6,6 @@ import NotesCard from "../components/notesCard";
 
 const Home = () => {
   const [notes, setNotes] = useState([]);
-  console.log(notes);
 
   useEffect(() => {
     setNotes(getLocalNotes());
@@ -23,7 +22,7 @@ const Home = () => {
       <div className="flex flex-col items-center gap-5 pt-24 px-4">
         <AddTaskForm onSubmit={onSubmit} />
         <LoginWarning />
-        <NotesCard notes={notes} />
+        <NotesCard setNotes={setNotes} notes={notes} />
       </div>
     </div>
   );
