@@ -29,11 +29,10 @@ const AddTaskForm = ({ onSubmit }) => {
           {errors?.title && (
             <p className="text-red-500 sm:hidden">{errors.title.message}</p>
           )}
-          <input
-            type="text"
+          <textarea
             placeholder="Task details"
             {...register("description")}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-300 resize-none h-10 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {errors?.description && (
             <p className="text-red-500 sm:hidden">
