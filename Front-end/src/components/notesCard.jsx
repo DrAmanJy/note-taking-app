@@ -1,10 +1,17 @@
-import { useState, useRef, useEffect } from "react";
-import getLocalNotes from "../utils/getLocalNotes";
+import { useRef, useEffect } from "react";
 
-const NotesCard = ({ notes, setNotes }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [editIndex, setEditIndex] = useState();
+const NotesCard = ({
+  notes,
+  handleDelete,
+  handleEdit,
+  handleSave,
+  handleCancel,
+  title,
+  description,
+  setTitle,
+  setDescription,
+  editIndex,
+}) => {
   const textareaRef = useRef(null);
 
   useEffect(() => {
@@ -13,47 +20,12 @@ const NotesCard = ({ notes, setNotes }) => {
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   }, [description]);
-  const handleDelete = (index) => {
-    const deletedNotes = notes.filter((_, i) => i !== index);
-    setNotes(deletedNotes);
-    localStorage.setItem("notes", JSON.stringify(deletedNotes));
-    setNotes(getLocalNotes());
-  };
-  const handleEdit = (index) => {
-    const note = notes.find((_, i) => i === index);
-    setTitle(note.title);
-    setDescription(note.description);
-    setEditIndex(index);
-  };
-  const handleCancel = () => {
-    setTitle();
-    setDescription();
-    setEditIndex();
-  };
-  const handleSave = (index) => {
-    const newNotes = notes.map((note, i) => {
-      if (i === index) {
-        return {
-          ...note,
-          title: title,
-          description: description,
-        };
-      }
-      return note;
-    });
-
-    setNotes(newNotes);
-    localStorage.setItem("notes", JSON.stringify(newNotes));
-    setTitle("");
-    setDescription("");
-    setEditIndex(null);
-  };
 
   return (
     <div className="w-full max-w-6xl flex flex-wrap justify-center gap-5 py-5 md:py-10 rounded-xl">
       {notes.map((note, i) => (
         <div
-          key={i}
+          key={note._id || i}
           className="w-full sm:w-[48%] xl:w-[32%] bg-red-50 rounded-lg flex flex-col p-4"
         >
           {editIndex === i ? (
@@ -67,7 +39,7 @@ const NotesCard = ({ notes, setNotes }) => {
                 value={description}
                 ref={textareaRef}
                 onChange={(e) => setDescription(e.target.value)}
-                className="text-sm sm:text-base overflow-hidden mb-4 px-3 py-2 border border-gray-300 rounded resize-none  focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-sm sm:text-base overflow-hidden mb-4 px-3 py-2 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </>
           ) : (
@@ -106,7 +78,7 @@ const NotesCard = ({ notes, setNotes }) => {
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(i)}
+                  onClick={() => handleDelete(note._id || i)}
                   className="flex-1 bg-gray-300 text-black py-2 px-4 rounded"
                 >
                   Delete
