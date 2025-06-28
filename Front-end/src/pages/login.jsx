@@ -44,9 +44,7 @@ const Login = () => {
           >
             {loading ? "loading" : "Login"}
           </button>
-          {fetchError && (
-            <p className="text-red-500 text-sm">{fetchError.message}</p>
-          )}
+          {fetchError && <p className="text-red-500 text-sm">{fetchError}</p>}
         </form>
         <p className="text-center text-sm text-gray-600">
           Don't have an account?{" "}
