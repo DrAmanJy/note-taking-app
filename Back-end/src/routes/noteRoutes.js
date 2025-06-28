@@ -6,12 +6,13 @@ import {
   getNotes,
   updateNote,
 } from "../controllers/noteController.js";
+import { protect } from "../middleware/protect.js";
 const noteRoutes = express.Router();
 
-noteRoutes.get("/", getNotes);
-noteRoutes.get("/:id", getNote);
-noteRoutes.post("/", addNote);
-noteRoutes.put("/:id", updateNote);
-noteRoutes.delete("/:id", deleteNote);
+noteRoutes.get("/", protect, getNotes);
+noteRoutes.get("/:id", protect, getNote);
+noteRoutes.post("/", protect, addNote);
+noteRoutes.put("/:id", protect, updateNote);
+noteRoutes.delete("/:id", protect, deleteNote);
 
 export default noteRoutes;
