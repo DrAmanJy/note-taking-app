@@ -1,28 +1,45 @@
-import { useEffect, useState } from "react";
 import AddTaskForm from "../components/addTaskForm";
 import LoginWarning from "../components/loginWarning";
-import getLocalNotes from "../utils/getLocalNotes";
 import NotesCard from "../components/notesCard";
+import { useAuth } from "../context/AuthContext";
+import useNotes from "../hooks/useNotes";
 
 const Home = () => {
-  const [notes, setNotes] = useState([]);
+  const {
+    notes,
+    setNotes,
+    addNote,
+    handleDelete,
+    handleEdit,
+    handleSave,
+    handleCancel,
+    title,
+    description,
+    setTitle,
+    setDescription,
+    editIndex,
+  } = useNotes();
 
-  useEffect(() => {
-    setNotes(getLocalNotes());
-  }, []);
+  const { user } = useAuth();
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    const newNotes = [...notes, data];
-    setNotes(newNotes);
-    localStorage.setItem("notes", JSON.stringify(newNotes));
-  };
   return (
     <div className="w-full min-h-screen bg-gradient-to-bl from-sky-500 via-sky-700 to-sky-900">
       <div className="flex flex-col items-center gap-5 pt-24 px-4">
-        <AddTaskForm onSubmit={onSubmit} />
-        <LoginWarning />
-        <NotesCard setNotes={setNotes} notes={notes} />
+        <AddTaskForm onSubmit={addNote} />
+        {!user && <LoginWarning />}
+        <NotesCard
+          notes={notes}
+          setNotes={setNotes}
+          handleDelete={handleDelete}
+          handleEdit={handleEdit}
+          handleSave={handleSave}
+          handleCancel={handleCancel}
+          title={title}
+          description={description}
+          setTitle={setTitle}
+          setDescription={setDescription}
+          editIndex={editIndex}
+        />
       </div>
     </div>
   );
