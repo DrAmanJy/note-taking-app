@@ -1,5 +1,6 @@
-import { createContext, useState, useContext } from "react";
-import { loginUser, signupUser } from "../services/authService";
+import { createContext, useState, useContext, useEffect } from "react";
+import { getCurrentUser, loginUser, signupUser } from "../services/authService";
+import { saveNotesToBackend } from "../utils/saveNotesToBackend";
 
 export const AuthContext = createContext(null);
 
@@ -8,6 +9,16 @@ export const AuthProvider = ({ children }) => {
   const [fetchError, setFetchError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState("local");
+  useEffect(() => {
+    const getUser = async () => {
+      const u = await getCurrentUser();
+      setUser(u);
+      if (u) {
+        setMode("online");
+      }
+    };
+    getUser();
+  }, []);
 
   const login = async (formData) => {
     setLoading(true);
@@ -30,6 +41,7 @@ export const AuthProvider = ({ children }) => {
       const result = await signupUser(formData);
       setUser(result.user);
       setFetchError(null);
+      saveNotesToBackend();
       setMode("online");
       alert(result.message);
     } catch (err) {
